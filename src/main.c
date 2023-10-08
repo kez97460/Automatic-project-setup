@@ -10,9 +10,9 @@ int createProject(const char* project_name, const char* file_extension, const ch
 int main(int argc, char const *argv[])
 {
     int status;
-    char project_name[STRING_MAX_SIZE / 4];
-    char file_extension[STRING_MAX_SIZE / 4];
-    char project_path[STRING_MAX_SIZE / 4];
+    char project_name[STRING_MAX_SIZE / 4] = "";
+    char file_extension[STRING_MAX_SIZE / 4] = "";
+    char project_path[STRING_MAX_SIZE / 4] = "";
 
     // Verify the size of the arguments (we don't need buffer overflows)
     int charcount = 0;

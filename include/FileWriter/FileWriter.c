@@ -103,7 +103,7 @@ int c_writeReadme(char* filepath)
     
     fprintf(readme, "# Automatically setup project\n");
     fprintf(readme, "The software that generated this project configuration can be found on [Github](https://github.com/kez97460/Automatic-project-setup).\n");
-    fprintf(readme, "This README can help you understand how to properly use this setup.\n\n");
+    fprintf(readme, "This README is here to help you understand how to properly use this setup.\n\n");
 
     fprintf(readme, "## Directories\n\n");
 
@@ -245,7 +245,7 @@ int cpp_writeReadme(char* filepath)
     
     fprintf(readme, "# Automatically setup project\n");
     fprintf(readme, "The software that generated this project configuration can be found on [Github](https://github.com/kez97460/Automatic-project-setup).\n");
-    fprintf(readme, "This README can help you understand how to properly use this setup.\n\n");
+    fprintf(readme, "This README is here to help you understand how to properly use this setup.\n\n");
 
     fprintf(readme, "## Directories\n\n");
 

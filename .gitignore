@@ -1,3 +1,5 @@
 .vscode
 app
+auto_project_setup
 Auto_project_setup
+*.o
