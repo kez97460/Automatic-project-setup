@@ -10,6 +10,9 @@ int createProject(const char* project_name, const char* file_extension, const ch
 int main(int argc, char const *argv[])
 {
     int status;
+    char project_name[STRING_MAX_SIZE / 4];
+    char file_extension[STRING_MAX_SIZE / 4];
+    char project_path[STRING_MAX_SIZE / 4];
 
     // Verify the size of the arguments (we don't need buffer overflows)
     int charcount = 0;
@@ -40,7 +43,22 @@ int main(int argc, char const *argv[])
 
     if(argc == 2 && (!strcmp(argv[1], "-i") || !strcmp(argv[1], "-interactive")))
     {
-        return 1;
+        printf("Project name : ");
+        if (fgets(project_name, 40, stdin))
+        {
+            project_name[strcspn(project_name, "\n")] = 0;
+        }
+        printf("File extension (c/cpp) : ");
+        if (fgets(file_extension, 40, stdin))
+        {
+            file_extension[strcspn(file_extension, "\n")] = 0;
+        }
+        printf("Path to the project folder : ");
+        if (fgets(project_path, 40, stdin))
+        {
+            project_path[strcspn(project_path, "\n")] = 0;
+        }
+        status = createProject(project_name, file_extension, project_path);
     }
         
     if(argc == 3)
@@ -102,6 +120,11 @@ int createProject(const char* project_name, const char* file_extension, const ch
         status = c_writeMakefile(temp_path);
         if(status) return 1;
 
+        // readme
+         strcpy(temp_path, path_to_project);
+        status = c_writeReadme(temp_path);
+        if(status) return 1;
+
         return 0;
     }
     if(!strcmp(file_extension, "cpp"))
@@ -124,6 +147,11 @@ int createProject(const char* project_name, const char* file_extension, const ch
         // makefile
         strcpy(temp_path, path_to_project);
         status = cpp_writeMakefile(temp_path);
+        if(status) return 1;
+
+        // readme
+        strcpy(temp_path, path_to_project);
+        status = cpp_writeReadme(temp_path);
         if(status) return 1;
 
         return 0;

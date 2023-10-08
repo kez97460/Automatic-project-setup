@@ -87,6 +87,9 @@ int c_writeMakefile(char* filepath)
     return 0;
 }
 
+/* @param filepath Path to the folder where 'README.md' is created, without a / at the end
+ * @retval Error status : should be 0 or there was an error
+ */
 int c_writeReadme(char* filepath)
 {
     strcat(filepath, "/README.md");
@@ -98,6 +101,41 @@ int c_writeReadme(char* filepath)
         return 1;
     }
     
+    fprintf(readme, "# Automatically setup project\n");
+    fprintf(readme, "The software that generated this project configuration can be found on [Github](https://github.com/kez97460/Automatic-project-setup).\n");
+    fprintf(readme, "This README can help you understand how to properly use this setup.\n\n");
+
+    fprintf(readme, "## Directories\n\n");
+
+    fprintf(readme, "### build\n");
+    fprintf(readme, "The Build directory will contain the object files (.o) that are generated when compiling.\n\n");
+
+    fprintf(readme, "### include\n");
+    fprintf(readme, "The include directory will contain all libraries included by the project (.h and .c files). These libraries may be put into as many independent folders as needed.\n\n");
+
+    fprintf(readme, "### src\n");
+    fprintf(readme, "The src directory contains the source files (.c), including the main function.\n\n");
+
+    fprintf(readme, "### Example\n");
+    fprintf(readme, "This structure is an example of how a project could look like :\n\n");
+    fprintf(readme, "```\n");
+    fprintf(readme, "|--lib\n");
+    fprintf(readme, "|  |\n");
+    fprintf(readme, "|  |--Bar\n");
+    fprintf(readme, "|  |  |- Bar.c\n");
+    fprintf(readme, "|  |  |- Bar.h\n");
+    fprintf(readme, "|  |\n");
+    fprintf(readme, "|  |--Foo\n");
+    fprintf(readme, "|  |  |- Foo.c\n");
+    fprintf(readme, "|  |  |- Foo.h\n");
+    fprintf(readme, "|  \n");
+    fprintf(readme, "|--src\n");
+    fprintf(readme, "|  |- main.c\n");
+    fprintf(readme, "```\n\n");
+
+    fprintf(readme, "## Makefile\n");
+    fprintf(readme, "This project can be compiled using the `make` command (assuming you have it installed). The object files, as well as the executable, which are generated during the compilation, may be removed at any time by using the `make clean` command.\n\n");
+    fprintf(readme, "The readme can be edited to change the compiler, compilation flags or the name of the generated executable.\n");
 
     fclose(readme);
 
@@ -187,6 +225,61 @@ int cpp_writeMakefile(char* filepath)
     fprintf(makefile, "\trm -f $(EXECUTABLE)\n");
 
     fclose(makefile);
+
+    return 0;
+}
+
+/* @param filepath Path to the folder where 'README.md' is created, without a / at the end
+ * @retval Error status : should be 0 or there was an error
+ */
+int cpp_writeReadme(char* filepath)
+{
+    strcat(filepath, "/README.md");
+
+    FILE* readme = fopen(filepath, "w");
+    if(readme == NULL)
+    {
+        printf("Unable to create the file \"README.md\"\n");
+        return 1;
+    }
+    
+    fprintf(readme, "# Automatically setup project\n");
+    fprintf(readme, "The software that generated this project configuration can be found on [Github](https://github.com/kez97460/Automatic-project-setup).\n");
+    fprintf(readme, "This README can help you understand how to properly use this setup.\n\n");
+
+    fprintf(readme, "## Directories\n\n");
+
+    fprintf(readme, "### build\n");
+    fprintf(readme, "The Build directory will contain the object files (.o) that are generated when compiling.\n\n");
+
+    fprintf(readme, "### include\n");
+    fprintf(readme, "The include directory will contain all libraries included by the project (.h and .cpp files). These libraries may be put into as many independent folders as needed.\n\n");
+
+    fprintf(readme, "### src\n");
+    fprintf(readme, "The src directory contains the source files (.cpp), including the main function.\n\n");
+
+    fprintf(readme, "### Example\n");
+    fprintf(readme, "This structure is an example of how a project could look like :\n\n");
+    fprintf(readme, "```\n");
+    fprintf(readme, "|--lib\n");
+    fprintf(readme, "|  |\n");
+    fprintf(readme, "|  |--Bar\n");
+    fprintf(readme, "|  |  |- Bar.cpp\n");
+    fprintf(readme, "|  |  |- Bar.h\n");
+    fprintf(readme, "|  |\n");
+    fprintf(readme, "|  |--Foo\n");
+    fprintf(readme, "|  |  |- Foo.cpp\n");
+    fprintf(readme, "|  |  |- Foo.h\n");
+    fprintf(readme, "|  \n");
+    fprintf(readme, "|--src\n");
+    fprintf(readme, "|  |- main.cpp\n");
+    fprintf(readme, "```\n\n");
+
+    fprintf(readme, "## Makefile\n");
+    fprintf(readme, "This project can be compiled using the `make` command (assuming you have it installed). The object files, as well as the executable, which are generated during the compilation, may be removed at any time by using the `make clean` command.\n\n");
+    fprintf(readme, "The readme can be edited to change the compiler, compilation flags or the name of the generated executable.\n");
+
+    fclose(readme);
 
     return 0;
 }

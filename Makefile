@@ -1,7 +1,7 @@
 # Compiler, flags, executable_name
 CC = gcc
 CFLAGS = -g -Wall -Wextra -I$(INCLUDE_DIR) # Do not remove -I$(INCLUDE_DIR)
-EXECUTABLE = app
+EXECUTABLE = Auto_project_setup
 
 # Directories
 SRC_DIR = src
