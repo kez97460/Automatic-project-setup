@@ -1,113 +1,83 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "settings.h"
 #include "FileWriter.h"
+#include "CommandParser.h"
+#include "ValidFlags.h"
 
-int createProject(const char* project_name, const char* file_extension, const char* path);
+// TODO : replace system() with mkdir() when possible to remove at least some of the stupidity behind this idea.
+int createProject(const char* project_name, const char* file_extension);
+void printHelpMessage();
+int interactiveMode();
 
 int main(int argc, char const *argv[])
-{
-    int status;
-    char project_name[STRING_MAX_SIZE / 4] = "";
-    char file_extension[STRING_MAX_SIZE / 4] = "";
-    char project_path[STRING_MAX_SIZE / 4] = "";
+{    
+    int state;
+    if (argc == 1)
+    {
+        state = interactiveMode();
+        return state;
+    }  
 
-    // Verify the size of the arguments (we don't need buffer overflows)
-    int charcount = 0;
-    for (int i = 0; i < argc; i++)
-    {
-        charcount += strlen(argv[i]);
-    }
-    if(charcount > STRING_MAX_SIZE / 4)
-    {
-        printf("Why are these arguments so f*cking LONG ?\n");
+    CommandFlags flags = getFlagsFromCommand(argc, argv);
+    if (flags.size < 0) // Error handling
         return 1;
-    }
-    
-    // Do different things based on number of args
 
-    if(argc == 1)
+    /* for (int i = 0; i < flags.size; i++)
     {
-        printf("Incorrect use. There are 2 ways to use this program : \n");
-        printf("1. '%s -interactive' or '%s -i' - open an interactive menu \n", argv[0], argv[0]);
-        printf("2. '%s [project_name] [language_file_extension] [path(optional)]' \n\n", argv[0]);
-        printf("Currently supported languages : \n");
-        printf("- C (file extension : c), \n");
-        printf("- C++ (file extension : cpp), \n");
-        // printf("- SystemVerilog (file extension : sv), WIP and simple projects only \n");
-
-        exit(EXIT_FAILURE);
-    }
-
-    if(argc == 2 && (!strcmp(argv[1], "-i") || !strcmp(argv[1], "-interactive")))
-    {
-        printf("Project name : ");
-        if (fgets(project_name, 40, stdin))
-        {
-            project_name[strcspn(project_name, "\n")] = 0;
-        }
-        printf("File extension (c/cpp) : ");
-        if (fgets(file_extension, 40, stdin))
-        {
-            file_extension[strcspn(file_extension, "\n")] = 0;
-        }
-        printf("Path to the project folder : ");
-        if (fgets(project_path, 40, stdin))
-        {
-            project_path[strcspn(project_path, "\n")] = 0;
-        }
-        status = createProject(project_name, file_extension, project_path);
-    }
-        
-    if(argc == 3)
-        status = createProject(argv[1], argv[2], "");
-
-    if(argc == 4)
-        status = createProject(argv[1], argv[2], argv[3]);
+        printf("Flag : [%s], argument : [%s]\n", flags.params[i].flag, flags.params[i].value);
+    } */
     
-    if(status == 0) printf("Setup finished.\n");
-    else printf("A problem accured, could not create project\n");
-    return status;
+    CommandParams params = processFlags(flags);
+    if(params.help_asked)
+    {
+        printHelpMessage();
+        return 0;
+    }
+
+    printf("Name : %s, Language : %s\n", params.project_name, params.project_language);
+    
+
+
+    createProject(params.project_name, params.project_language);
+
+    return 0;
 }
 
 /*---Other functions---*/
 
 /* Returns 0 if the project was successfully created and 1 otherwise */
-int createProject(const char* project_name, const char* file_extension, const char* path)
+int createProject(const char* project_name, const char* file_extension)
 {
-    char command[3*STRING_MAX_SIZE];
     char path_to_project[2*STRING_MAX_SIZE];
     char temp_path[2*STRING_MAX_SIZE];
     int status = 0;
 
-    /* Setup path_to_project */
-    if(!strcmp(path, ""))
-        strcpy(path_to_project, "./");
-    else
-    {
-        strcpy(path_to_project, path);
-        if(path_to_project[strlen(path_to_project) - 1] != '/')
-            strcat(path_to_project, "/");
-    }
-    strcat(path_to_project, project_name);
+    strcpy(path_to_project, project_name);
 
     // Create the project folder
-    sprintf(command, "mkdir -v %s", path_to_project);
-    system(command);
+    mkdir(path_to_project, 0700);
 
     // Add things inside the project folder depending on language
     if (!strcmp(file_extension, "c"))
     {
         /* Creation of src, include, build folders and main.c */
         // directories
-        sprintf(command, "mkdir -v %s/src", path_to_project);
-        system(command);
-        sprintf(command, "mkdir -v %s/include", path_to_project);
-        system(command);
-        sprintf(command, "mkdir -v %s/build", path_to_project);
-        system(command);
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/src");
+        mkdir(temp_path, 0700);
+
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/include");
+        mkdir(temp_path, 0700);
+
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/build");
+        mkdir(temp_path, 0700);
 
         // main.c
         strcpy(temp_path, path_to_project);
@@ -131,12 +101,17 @@ int createProject(const char* project_name, const char* file_extension, const ch
     {
         /* Creation of src, include, build folders and main.c */
         // directories
-        sprintf(command, "mkdir -v %s/src", path_to_project);
-        system(command);
-        sprintf(command, "mkdir -v %s/include", path_to_project);
-        system(command);
-        sprintf(command, "mkdir -v %s/build", path_to_project);
-        system(command);
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/src");
+        mkdir(temp_path, 0700);
+        
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/include");
+        mkdir(temp_path, 0700);
+
+        strcpy(temp_path, path_to_project);
+        strcat(temp_path, "/build");
+        mkdir(temp_path, 0700);
 
         // main.cpp
         strcpy(temp_path, path_to_project);
@@ -160,4 +135,46 @@ int createProject(const char* project_name, const char* file_extension, const ch
     printf("Error : Invalid project type. \n");
     printf("Valid types : c, cpp\n");
     return 1;
+}
+
+void printHelpMessage()
+{
+    printf("\n---Help message---\n");
+    printf("This program can simply be executed without any arguments in order to be used.\n");
+    printf("However, it may be faster to use them.\n");
+    printf("Here is a list of valid flags. \n\n");
+
+    printf("--help                                      -> show this message\n\n");
+
+    printf("-l [language] (same as --lang, --language)  -> choose the project language\n");
+    printf("                                               valid languages : c, cpp\n\n");
+
+    printf("-n [name] (same as --name)                  -> choose the name of the project directory (could be a path to the directory)\n\n");
+
+   /*  printf("-p [path] (same as --path)                  -> path to the project directory\n\n"); */
+
+}
+
+int interactiveMode()
+{
+    char path_to_project[256];
+    char language[32];
+    int state;
+
+    printf("Name / path to the project : ");
+    if (!fgets(path_to_project, 256, stdin))
+    {
+        return 1;
+    }
+    path_to_project[strcspn(path_to_project, "\n")] = 0;
+
+    printf("Language (c/cpp) : ");
+    if (!fgets(language, 32, stdin))
+    {
+        return 1;
+    }
+    language[strcspn(language, "\n")] = 0;
+
+    state = createProject(path_to_project, language);
+    return state;
 }
