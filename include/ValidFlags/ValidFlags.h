@@ -9,12 +9,9 @@ typedef struct CommandParams
 {
     bool help_asked;
     char project_name[MAX_ARG_SIZE];
-    char path_to_project[MAX_ARG_SIZE];
+    /* char path_to_project[MAX_ARG_SIZE]; */
     char project_language[MAX_ARG_SIZE];
 } CommandParams;
-
-const CommandParams DEFAULT_PARAMS = (CommandParams) {false, "New_project", "", ""};
-const CommandParams HELP_PARAMS = (CommandParams) {true, "error", "", "error"};
 
 CommandParams processFlags(CommandFlags flags);
 

@@ -10,48 +10,57 @@
 #include "ValidFlags.h"
 
 // TODO : replace system() with mkdir() when possible to remove at least some of the stupidity behind this idea.
-int createProject(const char* project_name, const char* file_extension, const char* path);
+int createProject(const char* project_name, const char* file_extension);
 void printHelpMessage();
+int interactiveMode();
 
 int main(int argc, char const *argv[])
 {    
+    int state;
+    if (argc == 1)
+    {
+        state = interactiveMode();
+        return state;
+    }  
+
     CommandFlags flags = getFlagsFromCommand(argc, argv);
-    for (int i = 0; i < flags.size; i++)
+    if (flags.size < 0) // Error handling
+        return 1;
+
+    /* for (int i = 0; i < flags.size; i++)
     {
         printf("Flag : [%s], argument : [%s]\n", flags.params[i].flag, flags.params[i].value);
-    }
+    } */
     
     CommandParams params = processFlags(flags);
+    if(params.help_asked)
+    {
+        printHelpMessage();
+        return 0;
+    }
 
-    printf("Name : %s, Path : %s, Language : %s\n", params.project_name, params.path_to_project, params.project_language);
+    printf("Name : %s, Language : %s\n", params.project_name, params.project_language);
     
+
+
+    createProject(params.project_name, params.project_language);
+
     return 0;
 }
 
 /*---Other functions---*/
 
 /* Returns 0 if the project was successfully created and 1 otherwise */
-int createProject(const char* project_name, const char* file_extension, const char* path)
+int createProject(const char* project_name, const char* file_extension)
 {
-    char command[3*STRING_MAX_SIZE];
     char path_to_project[2*STRING_MAX_SIZE];
     char temp_path[2*STRING_MAX_SIZE];
     int status = 0;
 
-    /* Setup path_to_project */
-    if(!strcmp(path, ""))
-        strcpy(path_to_project, "./");
-    else
-    {
-        strcpy(path_to_project, path);
-        if(path_to_project[strlen(path_to_project) - 1] != '/')
-            strcat(path_to_project, "/");
-    }
-    strcat(path_to_project, project_name);
+    strcpy(path_to_project, project_name);
 
     // Create the project folder
-    sprintf(command, "mkdir -v %s", path_to_project);
-    system(command);
+    mkdir(path_to_project, 0700);
 
     // Add things inside the project folder depending on language
     if (!strcmp(file_extension, "c"))
@@ -130,16 +139,42 @@ int createProject(const char* project_name, const char* file_extension, const ch
 
 void printHelpMessage()
 {
+    printf("\n---Help message---\n");
     printf("This program can simply be executed without any arguments in order to be used.\n");
     printf("However, it may be faster to use them.\n");
     printf("Here is a list of valid flags. \n\n");
 
-    printf("--help \tshow this message\n\n");
+    printf("--help                                      -> show this message\n\n");
 
-    printf("-l [language] (same as --lang, --language) \tchoose the project language\nValid languages : c, cpp\n\n");
+    printf("-l [language] (same as --lang, --language)  -> choose the project language\n");
+    printf("                                               valid languages : c, cpp\n\n");
 
-    printf("-n [name] (same as --name) \tchoose the name of the project directory\n\n");
+    printf("-n [name] (same as --name)                  -> choose the name of the project directory (could be a path to the directory)\n\n");
 
-    printf("-p [path] (same as --path) \tpath to the project directory\n\n");
+   /*  printf("-p [path] (same as --path)                  -> path to the project directory\n\n"); */
 
+}
+
+int interactiveMode()
+{
+    char path_to_project[256];
+    char language[32];
+    int state;
+
+    printf("Name / path to the project : ");
+    if (!fgets(path_to_project, 256, stdin))
+    {
+        return 1;
+    }
+    path_to_project[strcspn(path_to_project, "\n")] = 0;
+
+    printf("Language (c/cpp) : ");
+    if (!fgets(language, 32, stdin))
+    {
+        return 1;
+    }
+    language[strcspn(language, "\n")] = 0;
+
+    state = createProject(path_to_project, language);
+    return state;
 }

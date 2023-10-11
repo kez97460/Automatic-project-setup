@@ -36,7 +36,7 @@ CommandFlags getFlagsFromCommand(int argc, const char* argv[])
         if(!waiting_for_value && !isFlag(argv[i])) // no current flag and we get a value : error
         {
             printf("Invalid command \n");
-            return (CommandFlags){NULL, 0};
+            return (CommandFlags){NULL, -1};
         }
 
         if(isFlag(argv[i])) // new flag detected : add a parameter
