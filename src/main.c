@@ -16,11 +16,11 @@ int interactiveMode();
 
 int main(int argc, char const *argv[])
 {    
-    int state;
+    int status;
     if (argc == 1)
     {
-        state = interactiveMode();
-        return state;
+        status = interactiveMode();
+        return status;
     }  
 
     CommandFlags flags = getFlagsFromCommand(argc, argv);
@@ -39,13 +39,15 @@ int main(int argc, char const *argv[])
         return 0;
     }
 
-    printf("Name : %s, Language : %s\n", params.project_name, params.project_language);
-    
+    /* printf("Name : %s, Language : %s\n", params.project_name, params.project_language); */
 
+    status = createProject(params.project_name, params.project_language);
 
-    createProject(params.project_name, params.project_language);
-
-    return 0;
+    if (status == 0)
+    {
+        printf("Project successfully created.\nName : \"%s\", Language : %s\n", params.project_name, params.project_language);
+    }
+    return status;
 }
 
 /*---Other functions---*/
@@ -139,7 +141,7 @@ int createProject(const char* project_name, const char* file_extension)
 
 void printHelpMessage()
 {
-    printf("\n---Help message---\n");
+    printf("---Help message---\n");
     printf("This program can simply be executed without any arguments in order to be used.\n");
     printf("However, it may be faster to use them.\n");
     printf("Here is a list of valid flags. \n\n");

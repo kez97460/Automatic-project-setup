@@ -35,7 +35,7 @@ int c_writeMakefile(char* filepath)
     
     fprintf(makefile, "# Compiler, flags, executable_name\n");
     fprintf(makefile, "CC = gcc\n");
-    fprintf(makefile, "CFLAGS = -g -Wall -Wextra -I$(INCLUDE_DIR) # Do not remove -I$(INCLUDE_DIR)\n");
+    fprintf(makefile, "CFLAGS = -g -Wall -Wextra # -g : debug flag\n");
     fprintf(makefile, "EXECUTABLE = app\n\n");
 
     fprintf(makefile, "# Directories\n");
@@ -52,14 +52,14 @@ int c_writeMakefile(char* filepath)
     fprintf(makefile, "OBJ_FILES = $(patsubst $(SRC_DIR)/%%.c,$(BUILD_DIR)/%%.o,$(SRC_FILES))\n\n");
 
     fprintf(makefile, "# Automatically find library directories\n");
-    fprintf(makefile, "LIBRARY_DIRS = $(wildcard $(INCLUDE_DIR)/*/)\n\n");
+    fprintf(makefile, "LIBRARY_DIRS = $(wildcard $(INCLUDE_DIR)/*/) $(INCLUDE_DIR)/\n\n");
 
     fprintf(makefile, "# Include directories for libraries\n");
     fprintf(makefile, "LIBRARY_INCLUDES = $(foreach dir, $(LIBRARY_DIRS), -I$(dir))\n\n");
 
     fprintf(makefile, "# Library source files\n");
     fprintf(makefile, "LIBRARY_SRC_FILES = $(wildcard $(addsuffix *.c, $(LIBRARY_DIRS)))\n");
-    fprintf(makefile, "LIBRARY_OBJ_FILES = $(patsubst %%c, $(BUILD_DIR)/%%.o, $(notdir $(LIBRARY_SRC_FILES)))\n\n");
+    fprintf(makefile, "LIBRARY_OBJ_FILES = $(patsubst %%.c, $(BUILD_DIR)/%%.o, $(notdir $(LIBRARY_SRC_FILES)))\n\n");
 
     fprintf(makefile, "# Default target\n");
     fprintf(makefile, "all: $(EXECUTABLE)\n\n");
@@ -69,7 +69,10 @@ int c_writeMakefile(char* filepath)
     fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
 
     fprintf(makefile, "# Compile library source files into object files\n");
-    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/*/%%.c\n");
+    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/*/%%.c # Libraries in separate folders\n");
+    fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
+
+    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/%%.c # libraries directly in include/\n");
     fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
 
     fprintf(makefile, "# Link object files to create the executable\n");
@@ -79,8 +82,11 @@ int c_writeMakefile(char* filepath)
     fprintf(makefile, "# Clean build artifacts\n");
     fprintf(makefile, "clean:\n");
     fprintf(makefile, "\trm -f $(BUILD_DIR)/*.o\n");
-    fprintf(makefile, "\trm -f $(EXECUTABLE)\n");
+    fprintf(makefile, "\trm -f $(EXECUTABLE)\n\n");
 
+    fprintf(makefile, "run:\n");
+    fprintf(makefile, "\tmake $(EXECUTABLE)\n");
+    fprintf(makefile, "\t./$(EXECUTABLE)\n");
 
     fclose(makefile);
 
@@ -175,10 +181,10 @@ int cpp_writeMakefile(char* filepath)
         printf("Unable to create the file \"Makefile\"\n");
         return 1;
     }
-    
+
     fprintf(makefile, "# Compiler, flags, executable_name\n");
     fprintf(makefile, "CC = g++\n");
-    fprintf(makefile, "CFLAGS = -g -Wall -Wextra -I$(INCLUDE_DIR) # Do not remove -I$(INCLUDE_DIR)\n");
+    fprintf(makefile, "CFLAGS = -g -Wall -Wextra # -g : debug flag\n");
     fprintf(makefile, "EXECUTABLE = app\n\n");
 
     fprintf(makefile, "# Directories\n");
@@ -195,14 +201,14 @@ int cpp_writeMakefile(char* filepath)
     fprintf(makefile, "OBJ_FILES = $(patsubst $(SRC_DIR)/%%.cpp,$(BUILD_DIR)/%%.o,$(SRC_FILES))\n\n");
 
     fprintf(makefile, "# Automatically find library directories\n");
-    fprintf(makefile, "LIBRARY_DIRS = $(wildcard $(INCLUDE_DIR)/*/)\n\n");
+    fprintf(makefile, "LIBRARY_DIRS = $(wildcard $(INCLUDE_DIR)/*/) $(INCLUDE_DIR)/\n\n");
 
     fprintf(makefile, "# Include directories for libraries\n");
     fprintf(makefile, "LIBRARY_INCLUDES = $(foreach dir, $(LIBRARY_DIRS), -I$(dir))\n\n");
 
     fprintf(makefile, "# Library source files\n");
     fprintf(makefile, "LIBRARY_SRC_FILES = $(wildcard $(addsuffix *.cpp, $(LIBRARY_DIRS)))\n");
-    fprintf(makefile, "LIBRARY_OBJ_FILES = $(patsubst %%c, $(BUILD_DIR)/%%.o, $(notdir $(LIBRARY_SRC_FILES)))\n\n");
+    fprintf(makefile, "LIBRARY_OBJ_FILES = $(patsubst %%.cpp, $(BUILD_DIR)/%%.o, $(notdir $(LIBRARY_SRC_FILES)))\n\n");
 
     fprintf(makefile, "# Default target\n");
     fprintf(makefile, "all: $(EXECUTABLE)\n\n");
@@ -212,7 +218,10 @@ int cpp_writeMakefile(char* filepath)
     fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
 
     fprintf(makefile, "# Compile library source files into object files\n");
-    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/*/%%.cpp\n");
+    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/*/%%.cpp # Libraries in separate folders\n");
+    fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
+
+    fprintf(makefile, "$(BUILD_DIR)/%%.o: $(INCLUDE_DIR)/%%.cpp # libraries directly in include/\n");
     fprintf(makefile, "\t$(CC) $(CFLAGS) $(LIBRARY_INCLUDES) -c $< -o $@\n\n");
 
     fprintf(makefile, "# Link object files to create the executable\n");
@@ -222,10 +231,13 @@ int cpp_writeMakefile(char* filepath)
     fprintf(makefile, "# Clean build artifacts\n");
     fprintf(makefile, "clean:\n");
     fprintf(makefile, "\trm -f $(BUILD_DIR)/*.o\n");
-    fprintf(makefile, "\trm -f $(EXECUTABLE)\n");
+    fprintf(makefile, "\trm -f $(EXECUTABLE)\n\n");
+
+    fprintf(makefile, "run:\n");
+    fprintf(makefile, "\tmake $(EXECUTABLE)\n");
+    fprintf(makefile, "\t./$(EXECUTABLE)\n");
 
     fclose(makefile);
-
     return 0;
 }
 
