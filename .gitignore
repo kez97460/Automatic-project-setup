@@ -3,3 +3,7 @@
 **/auto_project_setup
 **/Auto_project_setup
 **/*.o
+test/**
+build/**
+dist/**
+*.spec
