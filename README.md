@@ -1,10 +1,9 @@
 ## Compiling python code
 
-Use pyinstaller to compile the code to a single executable with the command : 
+You can compile the program into a single portable executable by simply executing the script `compile.sh`.
 
-```bash
-pyinstaller -F main.py
-```
+It requires you to have [**pyinstaller**](https://pyinstaller.org/en/stable/index.html) installed. 
+
 ## Usage
 
 ```bash
