@@ -13,7 +13,7 @@ Options :
 -l, --language      language of the project (for projects only)
 -h, --help          show this
 
-Example : {sys.argv[0]} -n ../great_idea -l c++
+Example : {sys.argv[0]} project -n ../great_idea -l c++
 
 Not using any options opens an interactive menu instead.
 """

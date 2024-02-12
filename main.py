@@ -1,6 +1,7 @@
 import os, sys
 from python_libs.Command import *
 from python_libs.file_strings import * 
+import shutil
 
 def create_lib(lib_name : str) :
     # Test if "lib" folder exists
@@ -9,19 +10,21 @@ def create_lib(lib_name : str) :
         print("Aborted library creation")
         return
 
-    os.makedirs(f"lib/{lib_name}")
+    os.chdir("lib")
+    os.makedirs(lib_name)
+    os.chdir(lib_name)
 
-    with open(f"lib/{lib_name}/{lib_name}.h", "w") as file :
+    with open(f"{lib_name}.h", "w") as file :
         file.write(h_file(lib_name))
 
-    with open(f"lib/{lib_name}/{lib_name}.c", "w") as file :
+    with open(f"{lib_name}.c", "w") as file :
         file.write(c_cpp_file(lib_name))
 
     print(f"Successfully created library {lib_name}")  
 
 def create_header(header_name : str) :
     """
-    Create a header without an associated file (.h) directly in the lib folder
+    Create a header without an associated file (.h only) directly in the lib folder
     """
     # Test if "lib" folder exists
     if not os.path.isdir("lib") :
@@ -32,10 +35,9 @@ def create_header(header_name : str) :
     with open(f"lib/{header_name}.h", "w") as file :
         file.write(h_file(header_name))
 
-    print(f"Successfully created header {header_name}") 
+    print(f"Successfully created header {header_name}.h") 
 
 def create_project_c_cpp(project_name : str, language : str) :
-    
     # test language validity
     if language in ["c", "C"] :
         language = "c"
@@ -47,8 +49,14 @@ def create_project_c_cpp(project_name : str, language : str) :
         return
     
     os.makedirs(project_name)
-    os.chdir(project_name)
 
+    app_path = sys.argv[0]
+    if ".py" in app_path : # lazy af but works
+        pass
+    else :
+        shutil.copyfile(sys.argv[0], f"{project_name}/aps")
+
+    os.chdir(project_name)
     os.makedirs("lib")
     os.makedirs("src")
     os.makedirs("build")

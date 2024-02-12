@@ -30,14 +30,12 @@ def h_file(lib_name : str):
 /*----- Functions -----*/
 
 #endif
-
 """
     return h_file_contents
 
 # c_file needs the lib name to include it
 def c_cpp_file(lib_name : str):
     c_cpp_file_contents = f"""#include "{lib_name}.h"
-
 """
     return c_cpp_file_contents
 
